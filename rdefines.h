@@ -1,5 +1,13 @@
 #pragma once
 
+/**
+ * @file rdefines.h
+ * @author Radu-D. Chira
+ * @brief Defines I use the most while writing C
+ * @version 0.1
+ * @date 2024-01-10
+ */
+
 #include <stdbool.h>
 #include <assert.h>
 
@@ -14,6 +22,12 @@
     #define RPLATFORM_APPLE 1
 #else
     #error "Unsupported"
+#endif
+
+#ifdef _MSC_VER
+    #define DEBUGBREAK() __debugbreak()
+#else
+    #define DEBUGBREAK() 
 #endif
 
 #ifdef REXPORT
@@ -48,18 +62,18 @@
     for (unsigned long long _i = 0; _i < ARRAY_SIZE((array)); _i++) \
         if (((item) = array[_i]) || 1)
 
-static_assert(sizeof(unsigned char)      == 1, "Char expected to be 1 Byte!");
-static_assert(sizeof(unsigned short)     == 2, "Short expected to be 1 Byte!");
-static_assert(sizeof(unsigned int)       == 4, "Int expected to be 1 Byte!");
-static_assert(sizeof(unsigned long long) == 8, "Long long expected to be 1 Byte!");
+static_assert(sizeof(unsigned char)      == 1, "Unsigned char expected to be 1 Byte!");
+static_assert(sizeof(unsigned short)     == 2, "Unsigned short expected to be 1 Byte!");
+static_assert(sizeof(unsigned int)       == 4, "Unsigned int expected to be 1 Byte!");
+static_assert(sizeof(unsigned long long) == 8, "Unsigned long long expected to be 1 Byte!");
 
-static_assert(sizeof(signed char)        == 1, "Char expected to be 1 Byte!");
-static_assert(sizeof(signed short)       == 2, "Short expected to be 1 Byte!");
-static_assert(sizeof(signed int)         == 4, "Int expected to be 1 Byte!");
-static_assert(sizeof(signed long long)   == 8, "Long long expected to be 1 Byte!");
+static_assert(sizeof(signed char)        == 1, "Signed char expected to be 1 Byte!");
+static_assert(sizeof(signed short)       == 2, "Signed short expected to be 1 Byte!");
+static_assert(sizeof(signed int)         == 4, "Signed int expected to be 1 Byte!");
+static_assert(sizeof(signed long long)   == 8, "Signed long long expected to be 1 Byte!");
 
-static_assert(sizeof(float)              == 4, "Char expected to be 1 Byte!");
-static_assert(sizeof(double)             == 8, "Short expected to be 1 Byte!");
+static_assert(sizeof(float)              == 4, "Float expected to be 1 Byte!");
+static_assert(sizeof(double)             == 8, "Double expected to be 1 Byte!");
 
 typedef unsigned char       u8;
 typedef unsigned short      u16;
