@@ -1,3 +1,3 @@
 # Basic functions for personal use
 
-## Logging System and I/O Operations for Windows
+## Logging System, I/O Operations etc. for Windows

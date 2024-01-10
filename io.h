@@ -1,14 +1,15 @@
 #pragma once
 
+#include "defines.h"
+
 /// @brief Struct to work with I/O specific functions
 typedef struct File
 {
-    void *handle;
-    long long len;
-    char *data;
-    int valid;
+    phandle handle;
+    u64 len;
+    u8 *data;
+    b8 valid;
 } File;
-typedef File *pFile;
 
 /// @brief File access options such as reading or writing
 typedef enum FileAccess
@@ -32,13 +33,13 @@ File file_open(const char *filename, FileAccess access);
  * @warning It ignores the fact of the file size being 0!
  * @return 1 on success or 0 on failure (check io_get_error())
 */
-int file_read(File *file);
+b8 file_read(File *file);
 
 /**
  * @brief Write a data buffer to file.
  * @return 1 on success or 0 on failure (check io_get_error())
 */
-int file_write(File *file, const char *data, long long data_len);
+b8 file_write(File *file, const char *data, long long data_len);
 
 /**
  * @brief Closes the opened file and frees the file data.

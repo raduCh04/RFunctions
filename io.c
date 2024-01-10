@@ -13,21 +13,21 @@ enum
 
 static enum Error
 {
-    INVALID_FILE_HANDLE = 0x02,
-    INVALID_FILE = 0x03,
-    FAILED_TO_GET_FILE_SIZE = 0x04,
-    FAILED_ALLOCATION = 0x05,
-    FAILED_READ_OPERATION = 0x06,
-    FAILED_WRITE_OPERATION = 0x07,
+    INVALID_FILE_HANDLE = 0x00,
+    INVALID_FILE = 0x01,
+    FAILED_TO_GET_FILE_SIZE = 0x02,
+    FAILED_ALLOCATION = 0x03,
+    FAILED_READ_OPERATION = 0x04,
+    FAILED_WRITE_OPERATION = 0x05,
 
-    ERROR_COUNT = 0x08 - INVALID_FILE_HANDLE,
+    ERROR_COUNT,
 } error;
 
 File file_open(const char *filename, FileAccess access)
 {
     File file = {0};
 
-    HANDLE file_handle = CreateFileA(filename, access == FILE_READ ? GENERIC_READ : GENERIC_WRITE, 
+    phandle file_handle = CreateFileA(filename, access == FILE_READ ? GENERIC_READ : GENERIC_WRITE, 
         0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (file_handle != INVALID_HANDLE_VALUE)
     {
@@ -45,7 +45,7 @@ File file_open(const char *filename, FileAccess access)
                         file.data = VirtualAlloc(NULL, file.len, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
                         if (file.data != NULL)
                         {
-                            file.valid = TRUE;
+                            file.valid = true;
                         }
                         else
                         {
@@ -62,7 +62,7 @@ File file_open(const char *filename, FileAccess access)
             } break;
             case FILE_WRITE:
             {
-                file.valid = TRUE;
+                file.valid = true;
             } break;
         }
     }
@@ -72,13 +72,13 @@ File file_open(const char *filename, FileAccess access)
     return file;
 }
 
-int file_read(File *file)
+b8 file_read(File *file)
 {
     if (file->valid)
     {
-        DWORD bytes_read = 0;
-        DWORD64 bytes_to_be_read = file->len;
-        PCHAR ptr = file->data;
+        DWORD bytes_read = 0; // Warning if the var is not DWORD aka unsinged long...annoying
+        usize bytes_to_be_read = file->len;
+        u8 *ptr = file->data;
 
         while (bytes_to_be_read > 0)
         {
@@ -102,23 +102,23 @@ int file_read(File *file)
     return FAILURE;
 }
 
-int file_write(File *file, const char *data, long long data_len)
+b8 file_write(File *file, const char *data, long long data_len)
 {
     if (file->valid)
     {
         DWORD bytes_written = 0;
-        DWORD64 bytes_to_be_written = data_len;
-        PCHAR ptr = file->data;
+        usize bytes_to_be_written = data_len;
+        u8 *ptr = file->data;
         while (bytes_to_be_written > 0)
         {
-            if (WriteFile(file->handle, data, bytes_to_be_written, &bytes_written, NULL) == FALSE)
+            if (WriteFile(file->handle, data, bytes_to_be_written, &bytes_written, NULL) == false)
             {
                 error = FAILED_WRITE_OPERATION;
                 return FAILURE;
             }
             if (bytes_written == 0)
             {
-                
+                error = FAILED_WRITE_OPERATION;
                 return FAILURE;
             }
             ptr += bytes_written;
@@ -147,13 +147,7 @@ const char *io_get_error(void)
 {
     const char *error_strings[ERROR_COUNT] = {"[Invalid file handle!]", "[Invalid file!]", 
         "[Failed to get file size!]", "[Failed allocation]", "[Failed read operation]", "[Failed write operation]"};
-    // INVALID_FILE_HANDLE = 0x02,
-    // INVALID_FILE = 0x03,
-    // FAILED_TO_GET_FILE_SIZE = 0x04,
-    // FAILED_ALLOCATION = 0x05,
-    // FAILED_READ_OPERATION = 0x06,
-    // FAILED_WRITE_OPERATION = 0x07,
-    return error_strings[error - INVALID_FILE_HANDLE];
+    return error_strings[error];
 }
 
 #else

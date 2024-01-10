@@ -1,4 +1,5 @@
 #pragma once
+#include "defines.h"
 
 typedef enum LogLevel
 {
@@ -12,9 +13,9 @@ typedef enum LogLevel
 } LogLevel;
 
 // Returns 0 on failure. If nothing shows up (or the program crashes) check the return value of the function!
-int log_init(void);
+b8 log_init(void);
 // Returns 0 on failure. If nothing shows up (or the program crashes) check the return value of the function!
-int log_output(LogLevel level, const char*, ...);
+b8 log_output(LogLevel level, const char*, ...);
 
 #define LOG_FATAL(str, ...) log_output(LOG_LEVEL_FATAL, str, __VA_ARGS__)
 #define LOG_ERROR(str, ...) log_output(LOG_LEVEL_ERROR, str, __VA_ARGS__)

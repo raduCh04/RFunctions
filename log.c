@@ -1,16 +1,24 @@
-#if defined(_WIN64) || defined(_WIN32)
+#include "log.h"
+
+#if RPLATFORM_WINDOWS == 1
 
 #include <Windows.h>
 #include <stdarg.h>
 #include <stdio.h>
-
-#include "log.h"
 
 enum
 {
     FAILURE = 0,
     SUCCESS = 1,
 };
+
+//TODO: Add error handling
+// static enum Error
+// {
+//     INVALID_HANDLE = 0x00,
+//     FAILED_TO_WRITE_CONSOLE = 0x01,
+
+// } error;
 
 enum
 {
@@ -32,19 +40,19 @@ enum
     WHITE             = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
 };
 
-static HANDLE g_stdout_handle = NULL;
+static phandle g_stdout_handle = NULL;
 
-int log_init(void)
+b8 log_init(void)
 {
     g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
     return (g_stdout_handle != NULL && g_stdout_handle != INVALID_HANDLE_VALUE) ? SUCCESS : FAILURE;
 }
 
-#define MAX_LENGTH 1024
-int log_output(LogLevel level, const char *str, ...)
+enum { MAX_LENGTH = 1024 };
+b8 log_output(LogLevel level, const char *str, ...)
 {
     const char *level_str[LOG_LEVEL_COUNT] = { "[FATAL]: ", "[ERROR]: ", "[WARNING]: ", "[INFO]: ", "[DEBUG]: ", "[TRACE]: " };
-    const int colors[LOG_LEVEL_COUNT] = { RED, DARKRED, YELLOW, GREEN, BLUE, GRAY };
+    const i32 colors[LOG_LEVEL_COUNT] = { RED, DARKRED, YELLOW, GREEN, BLUE, GRAY };
 
     if (level < LOG_LEVEL_COUNT)
     {
@@ -61,14 +69,14 @@ int log_output(LogLevel level, const char *str, ...)
 
         _snprintf_s(out_message, MAX_LENGTH, MAX_LENGTH, "%02d:%02d:%02d: %s%s\n", st.wHour, st.wMinute, st.wSecond, level_str[level], buffer);
 
-        DWORD written = 0;
+        DWORD written = 0; // Warning if the var is not DWORD aka unsinged long...annoying
         SetConsoleTextAttribute(g_stdout_handle, colors[level]);
         if (!WriteConsoleA(g_stdout_handle, out_message, strnlen_s(out_message, MAX_LENGTH), &written, NULL))
         {
             SetConsoleTextAttribute(g_stdout_handle, WHITE);
             return FAILURE;
         }
-        if (written != strlen(out_message))
+        if ((u32)written != strlen(out_message))
         {
             SetConsoleTextAttribute(g_stdout_handle, WHITE);
             return FAILURE;
