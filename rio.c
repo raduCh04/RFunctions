@@ -3,7 +3,6 @@
 #if defined(_WIN64) || defined(_WIN32)
 
 #include <Windows.h>
-#include <stdio.h>
 
 enum
 {

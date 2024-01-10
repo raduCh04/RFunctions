@@ -28,16 +28,17 @@ b8 rlog_init(void);
 /// @brief Function to write to the console (used in macro)
 /// @param level What level is the output (Fatal, Error etc.)
 /// @return 1 on success or 0 on failure (call rio_check_error())
-b8 rlog_output(RLogLevel level, const char*, ...);
+b8 rlog_output(RLogLevel level, const char* str, ...);
 /**
  * @brief Helps at debugging stage to check for errors
  * @return A string with tiny description to check for the occured error
 */
+void rlog_end(void);
 const char *rlog_get_error(void);
 
-#define RLOG_FATAL(str, ...) log_output(RLOG_LEVEL_FATAL, str, __VA_ARGS__)
-#define RLOG_ERROR(str, ...) log_output(RLOG_LEVEL_ERROR, str, __VA_ARGS__)
-#define RLOG_WARNING(str, ...) log_output(RLOG_LEVEL_WARNING, str, __VA_ARGS__)
-#define RLOG_INFO(str, ...) log_output(RLOG_LEVEL_INFO, str, __VA_ARGS__)
-#define RLOG_DEBUG(str, ...) log_output(RLOG_LEVEL_DEBUG, str, __VA_ARGS__)
-#define RLOG_TRACe(str, ...) log_output(RLOG_LEVEL_TRACE, str, __VA_ARGS__)
+#define RLOG_FATAL(str, ...) rlog_output(RLOG_LEVEL_FATAL, str, ##__VA_ARGS__)
+#define RLOG_ERROR(str, ...) rlog_output(RLOG_LEVEL_ERROR, str, ##__VA_ARGS__)
+#define RLOG_WARNING(str, ...) rlog_output(RLOG_LEVEL_WARNING, str, ##__VA_ARGS__)
+#define RLOG_INFO(str, ...) rlog_output(RLOG_LEVEL_INFO, str, ##__VA_ARGS__)
+#define RLOG_DEBUG(str, ...) rlog_output(RLOG_LEVEL_DEBUG, str, ##__VA_ARGS__)
+#define RLOG_TRACe(str, ...) rlog_output(RLOG_LEVEL_TRACE, str, ##__VA_ARGS__)

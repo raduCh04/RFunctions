@@ -1,4 +1,5 @@
 #include "rlog.h"
+#include "rio.h"
 
 #if RPLATFORM_WINDOWS == 1
 
@@ -40,20 +41,23 @@ enum
     WHITE             = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
 };
 
-static phandle g_stdout_handle = NULL;
+// NOTE: Static variables already initialized to 0/NULL
+static phandle g_stdout_handle;
+static RFile g_file;
 
 b8 rlog_init(void)
 {
     g_stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (g_stdout_handle != NULL && g_stdout_handle != INVALID_HANDLE_VALUE) 
+    if (g_stdout_handle != NULL && g_stdout_handle != INVALID_HANDLE_VALUE)
     {
-        return RSUCCESS;
+        g_file = rfile_open("log.txt", RFILE_WRITE);
+        if (g_file.valid)
+            return RSUCCESS;
     }
-    error = RINVALID_HANDLE;
+    else
+        error = RINVALID_HANDLE;
     return RFAILURE;
 }
-
-
 
 enum { MAX_LENGTH = 1024 };
 b8 rlog_output(RLogLevel level, const char *str, ...)
@@ -75,6 +79,7 @@ b8 rlog_output(RLogLevel level, const char *str, ...)
         GetLocalTime(&st);
 
         _snprintf_s(out_message, MAX_LENGTH, MAX_LENGTH, "%02d:%02d:%02d: %s%s\n", st.wHour, st.wMinute, st.wSecond, level_str[level], buffer); //TODO: Handle Error
+        rfile_write(&g_file, out_message, strnlen_s(out_message, MAX_LENGTH)); //TODO: Handle Error
 
         DWORD written = 0; // Warning if the var is not DWORD aka unsinged long...annoying
         SetConsoleTextAttribute(g_stdout_handle, colors[level]); //TODO: Handle Error
@@ -96,6 +101,11 @@ b8 rlog_output(RLogLevel level, const char *str, ...)
     
     SetConsoleTextAttribute(g_stdout_handle, WHITE); //TODO: Handle Error
     return RSUCCESS;
+}
+
+void rlog_end(void)
+{
+    rfile_close(&g_file);
 }
 
 const char *rlog_get_error(void)
